@@ -1,51 +1,25 @@
 import gui.JGraph;
+
 import javax.swing.JFrame;
-import csci2031.graph.Functions;
-import csci2031.graph.Graph;
-import csci2031.graph.UserPoints;
-import csci2031.math.Interpolation;
-import csci2031.math.Parametric;
-import csci2031.math.Spline;
+
+import math.functions.Quadratic;
+
+import draw.Graph;
+import draw.IGraph;
 
 public class Test extends JFrame {
 
+	private static final long serialVersionUID = 1802199483736051124L;
+
 	public static void main(String[] args) {
 		Test t = new Test();
-
-		JGraph g = new JGraph(-10, 10, 1, -10, 10, 1);
-
-		Functions functions = new Functions();
-		//UserPoints points = new UserPoints(g);
-
-//		Parametric p = new Parametric() {
-//			@Override
-//			public double x(double t) {
-//				return 5.0 * Math.sin(t);
-//			}
-//
-//			@Override
-//			public double y(double t) {
-//				return 5.0 * Math.cos(t);
-//			}
-//
-//			@Override
-//			public double maxt() {
-//				return Math.PI * 2.0;
-//			}
-//		};
-//		functions.add(p);
-//
-//		functions.add(Interpolation.polyInterpolate(points));
-//		functions.add(Spline.spline1(points));
-//		functions.add(Spline.spline3(points));
-
-		g.add(functions);
-		//g.add(points);
-
+		IGraph graph = new Graph();
+		graph.add(Quadratic.createStandard(-2.0, 3.0, 3.0));
+		JGraph g = new JGraph(-10, 10, -10, 10, graph);
 		t.add(g);
 
 		try {
-			Thread.sleep(2);
+			Thread.sleep(10);
 		} catch (InterruptedException e) {
 		}
 

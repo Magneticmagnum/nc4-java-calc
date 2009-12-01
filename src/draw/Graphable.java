@@ -1,7 +1,9 @@
 package draw;
 
+import gui.JGraph;
+
 public interface Graphable {
 
-	public void graph(IGraph graph);
+	public void graph(JGraph graph);
 
 }

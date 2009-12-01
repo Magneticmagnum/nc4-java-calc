@@ -14,59 +14,46 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.Rectangle2D;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import math.functions.Function;
 import math.matrices.Matrix;
-import csci2031.graph.GraphComponent;
-import csci2031.graph.Vector2D;
-import csci2031.math.Parametric;
+import draw.IGraph;
+import draw.Vector2D;
 
 public class JGraph extends JPanel implements ComponentListener,
 		MouseWheelListener, MouseMotionListener, KeyListener {
 
 	private static final long serialVersionUID = 3725534931202232960L;
-	private JLabel jLabel1;
-	private JLabel jLabel2;
-	private JLabel jLabel3;
+	private JLabel xLabel;
+	private JLabel ylabel;
 	private double xMax;
 	private double yMax;
 	private double xMin;
 	private double yMin;
-	private double xScl;
-	private double yScl;
-	// private double x;
-	// private double y;
-	private double scale = 1.0;
 
-	private Vector2D coordinateVector = new Vector2D();
+	private Vector2D mouse = new Vector2D();
 
 	private boolean isZoom = false;
 
 	private Matrix toWindow;
 	private Matrix toGraph;
 
-	// TODO this should be an IGraph instead. the IGraph will take care of all
-	// the components of this JGraph.
-	private ArrayList<GraphComponent> components;
+	private IGraph graph;
 
-	public JGraph(double xMin, double xMax, double xScl, double yMin,
-			double yMax, double yScl) {
+	public JGraph(double xMin, double xMax, double yMin, double yMax,
+			IGraph graph) {
 		this.xMin = xMin;
 		this.xMax = xMax;
-		this.xScl = xScl;
 		this.yMin = yMin;
 		this.yMax = yMax;
-		this.yScl = yScl;
 
-		components = new ArrayList<GraphComponent>();
+		this.graph = graph;
 
-		jLabel1 = new JLabel(String.valueOf(scale));
-		jLabel2 = new JLabel(String.valueOf(scale));
-		jLabel3 = new JLabel(String.valueOf(scale));
+		xLabel = new JLabel();
+		ylabel = new JLabel();
 
 		setLayout(new BorderLayout());
 		setFocusable(true);
@@ -74,9 +61,8 @@ public class JGraph extends JPanel implements ComponentListener,
 		setTransformations();
 
 		addComponentListener(this);
-		add(jLabel1, BorderLayout.SOUTH);
-		add(jLabel2, BorderLayout.NORTH);
-		add(jLabel3, BorderLayout.EAST);
+		add(xLabel, BorderLayout.NORTH);
+		add(ylabel, BorderLayout.EAST);
 		addMouseWheelListener(this);
 		addMouseMotionListener(this);
 		addKeyListener(this);
@@ -89,49 +75,33 @@ public class JGraph extends JPanel implements ComponentListener,
 		return new Rectangle2D.Double(xMin, yMax, xMax - xMin, yMax - yMin);
 	}
 
-	public void add(GraphComponent c) {
-		components.add(c);
-	}
-
 	@Override
 	public void paint(Graphics grid) {
 		super.paint(grid);
 		Graphics2D g = (Graphics2D) grid;
-
 		DecimalFormat oneDForm = new DecimalFormat("#.#");
-		DecimalFormat twoDForm = new DecimalFormat("#.##");
-		jLabel1.setText(String.valueOf(Double.valueOf(twoDForm.format(scale))
-				+ "x"));
-		jLabel2.setText(String
-				.valueOf(oneDForm.format(coordinateVector.getY())));
-		jLabel3.setText(String
-				.valueOf(oneDForm.format(coordinateVector.getX())));
+		xLabel.setText(String.valueOf(oneDForm.format(mouse.getY())));
+		ylabel.setText(String.valueOf(oneDForm.format(mouse.getX())));
 		drawXYAxis(g);
-		// for (GraphComponent c : components)
-		// c.paint(this, g);
+
+		for (Function f : graph.getFunctions())
+			draw(g, f);
 	}
 
-	public void drawXYAxis(Graphics g) {
+	private void drawXYAxis(Graphics g) {
 		g.setColor(Color.black); // axis color
 		drawLine(g, new Vector2D(xMin, 0), new Vector2D(xMax, 0)); // x-axis
 		drawLine(g, new Vector2D(0, yMin), new Vector2D(0, yMax)); // y-axis
 	}
 
-	public void drawLine(Graphics g, Vector2D p1, Vector2D p2) {
+	private void drawLine(Graphics g, Vector2D p1, Vector2D p2) {
 		p1 = toWindow(p1);
 		p2 = toWindow(p2);
 		g.drawLine((int) p1.getX(), (int) p1.getY(), (int) p2.getX(), (int) p2
 				.getY());
 	}
 
-	public void fillOvel(Graphics g, Vector2D vector, double diameter) {
-		vector = toWindow(vector);
-		g.fillOval((int) (vector.getX() - diameter / 2.0),
-				(int) (vector.getY() - diameter / 2.0), (int) diameter,
-				(int) diameter);
-	}
-
-	public void draw(Graphics g, Function f) {
+	private void draw(Graphics g, Function f) {
 		Rectangle2D rec = getRectangle();
 		double dx = (rec.getMaxX() - rec.getMinX()) / getWidth() * 2.0;
 
@@ -146,23 +116,6 @@ public class JGraph extends JPanel implements ComponentListener,
 		}
 	}
 
-	public void draw(Graphics g, Parametric p) {
-		double dt = p.maxt() / 1000.0;
-		Vector2D prev = new Vector2D(p.y(0.0), p.x(0.0));
-		for (double t = dt; t <= p.maxt() + dt; t += dt) {
-			Vector2D next = new Vector2D(p.y(t), p.x(t));
-			if (!(Double.isInfinite(prev.getY()) || Double.isNaN(prev.getY())
-					|| Double.isInfinite(next.getY())
-					|| Double.isNaN(next.getY())
-					|| Double.isInfinite(prev.getX())
-					|| Double.isNaN(prev.getX())
-					|| Double.isInfinite(next.getX()) || Double.isNaN(next
-					.getX())))
-				drawLine(g, prev, next);
-			prev = next;
-		}
-	}
-
 	public Vector2D toWindow(Vector2D v) {
 		return v.transform(toWindow);
 	}
@@ -171,66 +124,28 @@ public class JGraph extends JPanel implements ComponentListener,
 		return v.transform(toGraph);
 	}
 
-	// public Vector2D toWindow(double x, double y) {
-	// return new Vector2D((x - xMin) * getWidth() / (xMax - xMin), (yMax - y)
-	// * getHeight() / (yMax - yMin));
-	// }
-
-	// public Vector2D toGraph(double x, double y) {
-	// return new Vector2D(x * (xMax - xMin) / getWidth() + xMin,
-	// (getHeight() - y) * (yMax - yMin) / getHeight() + yMin);
-	// }
-
 	private void setTransformations() {
-		// TODO look this over again
-		// Brian: I'm not sure that I would delegate the ratio calculations off
-		// to another method. You'll have to call it four times for each ratio,
-		// so you should store it locally anyways so you might just save the
-		// time and do the calculation locally as well.
+		double ratio_x = getWidth() / (xMax - xMin);
+		double ratio_y = getHeight() / (yMax - yMin);
 		toWindow = new Matrix(new double[][] {
-				{ getXRatio(), 0.0, -getXRatio() * xMin },
-				{ 0.0, -getYRatio(), -getYRatio() * yMin } });
-		toGraph = new Matrix(new double[][] { { 1.0 / getXRatio(), 0.0, xMin },
-				{ 0.0, -1.0 / getYRatio(), -yMin } });
+	            {
+	                  ratio_x, 0.0, -ratio_x * xMin
+	            }, {
+	                  0.0, -ratio_y, ratio_y * yMax
+	            }
+	      });
+	      toGraph = new Matrix(new double[][] {
+	            {
+	                  1.0 / ratio_x, 0.0, xMin
+	            }, {
+	                  0.0, -1.0 / ratio_y, yMax
+	            }
+	      });
 	}
-
-	public double getGraphWidth() {
-		return getWidth();
-	}
-
-	public double getGraphHeight() {
-		return getHeight();
-	}
-
-	public double getXRatio() {
-		return getGraphWidth() / (xMax - xMin);
-	}
-
-	public double getYRatio() {
-		return getGraphHeight() / (yMax - yMin);
-	}
-
-	// public void setXCoordinate() {
-	// x = coordinateVector.getY();
-	// }
-
-	// public void setYCoordinate() {
-	// y = coordinateVector.getX();
-	// }
 
 	public void setCoordinate(MouseEvent e) {
-		coordinateVector = toGraph(new Vector2D(e.getX(), e.getY()));
-		// setXCoordinate();
-		// setYCoordinate();
+		mouse = toGraph(new Vector2D(e.getX(), e.getY()));
 	}
-
-	// public double getXCoordinate() {
-	// return coordinateVector.getX();
-	// }
-
-	// public double getYCoordinate() {
-	// return coordinateVector.getY();
-	// }
 
 	@Override
 	public void componentHidden(ComponentEvent e) {
@@ -252,10 +167,33 @@ public class JGraph extends JPanel implements ComponentListener,
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
-		// TODO Auto-generated method stub
 		if (isZoom) {
-			scale -= (1.0 * e.getWheelRotation());
-			scale = Math.max(1.0, scale);
+			setCoordinate(e);
+
+			double scale = -e.getWheelRotation() * 2.0;
+			if (scale == 0.0)
+				scale = 1.0;
+			else if (scale < 0.0)
+				scale = -1.0 / scale;
+
+			double xMinDist = mouse.getX() - xMin;
+			double xMaxDist = xMax - mouse.getX();
+
+			double yMinDist = mouse.getY() - yMin;
+			double yMaxDist = yMax - mouse.getY();
+
+			xMinDist /= scale;
+			xMaxDist /= scale;
+
+			yMinDist /= scale;
+			yMaxDist /= scale;
+
+			xMin = mouse.getX() - xMinDist;
+			xMax = mouse.getX() + xMaxDist;
+
+			yMin = mouse.getY() - yMinDist;
+			yMax = mouse.getY() + yMaxDist;
+
 			setTransformations();
 			repaint();
 		}
@@ -263,25 +201,24 @@ public class JGraph extends JPanel implements ComponentListener,
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		// TODO Auto-generated method stub
 		setCoordinate(e);
 		repaint();
 	}
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		// TODO Auto-generated method stub
 		setCoordinate(e);
 		repaint();
 	}
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		// TODO Auto-generated method stub
 		if (e.getKeyCode() == 17)
 			isZoom = true;
 		if (e.getKeyChar() == 'r') {
-			scale = 1.0;
+
+			// reset scale
+
 			setTransformations();
 			repaint();
 			isZoom = false;
@@ -290,14 +227,11 @@ public class JGraph extends JPanel implements ComponentListener,
 
 	@Override
 	public void keyReleased(KeyEvent e) {
-		// TODO Auto-generated method stub
 		if (e.getKeyCode() == 17)
 			isZoom = false;
 	}
 
 	@Override
 	public void keyTyped(KeyEvent e) {
-		// TODO Auto-generated method stub
-
 	}
 }
