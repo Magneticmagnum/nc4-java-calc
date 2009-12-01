@@ -1,5 +1,6 @@
 package draw;
 
+import gui.JGraph;
 import math.functions.Function;
 
 public class GFuction extends Function implements Graphable {
@@ -16,8 +17,8 @@ public class GFuction extends Function implements Graphable {
 	}
 
 	@Override
-	public void graph(IGraph graph) {
-		// TODO broken... not even sure this class is necessary... 
+	public void graph(JGraph graph) {
+		// TODO broken... not even sure this class is necessary...
 
 		// Rectangle2D rec = graph.getRectangle();
 		// double dx = (rec.getMaxX() - rec.getMinX()) / 800.0;

@@ -1,56 +1,32 @@
 package draw;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import math.functions.Function;
 
 // And why is this named like this? :-)
-public class Graph {
+public class Graph implements IGraph {
 
-	private ArrayList<Function> function;
-	private ArrayList<Function> funcPara;
-	private ArrayList<Function> funcPolar;
+	private ArrayList<Function> functions;
 
 	public Graph() {
-		function = new ArrayList<Function>();
-		funcPara = new ArrayList<Function>();
-		funcPolar = new ArrayList<Function>();
+		functions = new ArrayList<Function>();
 	}
 
-	public void addFunc(Function f) {
-		function.add(f);
+	@Override
+	public void add(Function f) {
+		functions.add(f);
 	}
 
-	public void removeFunc(Function f) {
-		function.remove(f);
+	@Override
+	public void remove(Function f) {
+		functions.remove(f);
 	}
 
-	public Function getFunc(int x) {
-		return function.get(x);
-	}
-
-	public void addPara(Function f) {
-		funcPara.add(f);
-	}
-
-	public void removePara(Function f) {
-		funcPara.remove(f);
-	}
-
-	public Function getPara(int x) {
-		return funcPara.get(x);
-	}
-
-	public void addPolar(Function f) {
-		funcPolar.add(f);
-	}
-
-	public Function removePolar(int x) {
-		return funcPolar.remove(x);
-	}
-
-	public Function getPolar(int f) {
-		return funcPolar.get(f);
+	@Override
+	public List<Function> getFunctions() {
+		return functions;
 	}
 
 }

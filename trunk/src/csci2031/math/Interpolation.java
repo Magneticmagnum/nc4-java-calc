@@ -4,7 +4,7 @@ import java.util.List;
 
 import math.functions.Function;
 import csci2031.graph.UserPoints;
-import csci2031.graph.Vector2D;
+import draw.Vector2D;
 
 public class Interpolation {
 

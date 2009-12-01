@@ -11,6 +11,7 @@ import java.util.ArrayList;
 
 import math.matrices.Vector;
 import csci2031.math.Utils;
+import draw.Vector2D;
 
 public class UserPoints implements GraphComponent, MouseListener, MouseMotionListener, KeyListener {
 

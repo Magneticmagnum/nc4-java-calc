@@ -6,11 +6,9 @@ import math.functions.Function;
 
 public interface IGraph {
 
-	public void addFunc(Function f);
+	public void add(Function f);
 
-	public void removeFunc(Function f);
-
-	public Function getFunc(int x);
+	public void remove(Function f);
 
 	public List<Function> getFunctions();
 

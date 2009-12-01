@@ -1,6 +1,6 @@
 package csci2031.math;
 
-import csci2031.graph.Vector2D;
+import draw.Vector2D;
 
 // TODO document class (50% complete)
 
