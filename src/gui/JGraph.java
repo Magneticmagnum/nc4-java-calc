@@ -12,7 +12,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.awt.geom.Rectangle2D;
 import java.text.DecimalFormat;
 
 import javax.swing.JLabel;
@@ -20,36 +19,34 @@ import javax.swing.JPanel;
 
 import math.functions.Function;
 import math.matrices.Matrix;
+import draw.GraphDims;
 import draw.IGraph;
+import draw.GraphDimsSubscriber;
 import draw.Vector2D;
 
-public class JGraph extends JPanel implements ComponentListener,
-		MouseWheelListener, MouseMotionListener, KeyListener {
+public class JGraph extends JPanel implements ComponentListener, MouseWheelListener, MouseMotionListener, KeyListener,
+		GraphDimsSubscriber {
 
 	private static final long serialVersionUID = 3725534931202232960L;
 	private JLabel xLabel;
 	private JLabel ylabel;
-	private double xMax;
-	private double yMax;
-	private double xMin;
-	private double yMin;
 
-	private Vector2D mouse = new Vector2D();
+	private Vector2D mouse = null;
 
 	private boolean isZoom = false;
+	private boolean isDrag = false;
 
 	private Matrix toWindow;
 	private Matrix toGraph;
 
 	private IGraph graph;
+	private GraphDims original;
+	private GraphDims current;
 
-	public JGraph(double xMin, double xMax, double yMin, double yMax,
-			IGraph graph) {
-		this.xMin = xMin;
-		this.xMax = xMax;
-		this.yMin = yMin;
-		this.yMax = yMax;
-
+	public JGraph(IGraph graph, GraphDims dimensions) {
+		this.original = dimensions.copy();
+		this.current = dimensions;
+		current.addSubscriber(this);
 		this.graph = graph;
 
 		xLabel = new JLabel();
@@ -71,17 +68,15 @@ public class JGraph extends JPanel implements ComponentListener,
 		repaint();
 	}
 
-	public Rectangle2D getRectangle() {
-		return new Rectangle2D.Double(xMin, yMax, xMax - xMin, yMax - yMin);
-	}
-
 	@Override
 	public void paint(Graphics grid) {
 		super.paint(grid);
 		Graphics2D g = (Graphics2D) grid;
-		DecimalFormat oneDForm = new DecimalFormat("#.#");
-		xLabel.setText(String.valueOf(oneDForm.format(mouse.getY())));
-		ylabel.setText(String.valueOf(oneDForm.format(mouse.getX())));
+		DecimalFormat oneDForm = new DecimalFormat("0.000");
+		if (mouse != null) {
+			xLabel.setText(String.valueOf(oneDForm.format(mouse.getY())));
+			ylabel.setText(String.valueOf(oneDForm.format(mouse.getX())));
+		}
 		drawXYAxis(g);
 
 		for (Function f : graph.getFunctions())
@@ -90,27 +85,24 @@ public class JGraph extends JPanel implements ComponentListener,
 
 	private void drawXYAxis(Graphics g) {
 		g.setColor(Color.black); // axis color
-		drawLine(g, new Vector2D(xMin, 0), new Vector2D(xMax, 0)); // x-axis
-		drawLine(g, new Vector2D(0, yMin), new Vector2D(0, yMax)); // y-axis
+		drawLine(g, new Vector2D(current.getMinX(), 0), new Vector2D(current.getMaxX(), 0)); // x-axis
+		drawLine(g, new Vector2D(0, current.getMinY()), new Vector2D(0, current.getMaxY())); // y-axis
 	}
 
 	private void drawLine(Graphics g, Vector2D p1, Vector2D p2) {
 		p1 = toWindow(p1);
 		p2 = toWindow(p2);
-		g.drawLine((int) p1.getX(), (int) p1.getY(), (int) p2.getX(), (int) p2
-				.getY());
+		g.drawLine((int) p1.getX(), (int) p1.getY(), (int) p2.getX(), (int) p2.getY());
 	}
 
 	private void draw(Graphics g, Function f) {
-		Rectangle2D rec = getRectangle();
-		double dx = (rec.getMaxX() - rec.getMinX()) / getWidth() * 2.0;
+		double dx = (current.getMaxX() - current.getMinX()) / getWidth() * 2.0;
 
-		Vector2D prev = new Vector2D(rec.getMinX(), f.f(rec.getMinX()));
-		for (double x = rec.getMinX() + dx; x <= rec.getMaxX() + dx; x += dx) {
+		Vector2D prev = new Vector2D(current.getMinX(), f.f(current.getMinX()));
+		for (double x = current.getMinX() + dx; x <= current.getMaxX() + dx; x += dx) {
 			Vector2D next = new Vector2D(x, f.f(x));
-			if (!(Double.isInfinite(prev.getY()) || Double.isNaN(prev.getY())
-					|| Double.isInfinite(next.getY()) || Double.isNaN(next
-					.getY())))
+			if (!(Double.isInfinite(prev.getY()) || Double.isNaN(prev.getY()) || Double.isInfinite(next.getY()) || Double
+					.isNaN(next.getY())))
 				drawLine(g, prev, next);
 			prev = next;
 		}
@@ -125,34 +117,26 @@ public class JGraph extends JPanel implements ComponentListener,
 	}
 
 	private void setTransformations() {
-		double ratio_x = getWidth() / (xMax - xMin);
-		double ratio_y = getHeight() / (yMax - yMin);
-		toWindow = new Matrix(new double[][] {
-	            {
-	                  ratio_x, 0.0, -ratio_x * xMin
-	            }, {
-	                  0.0, -ratio_y, ratio_y * yMax
-	            }
-	      });
-	      toGraph = new Matrix(new double[][] {
-	            {
-	                  1.0 / ratio_x, 0.0, xMin
-	            }, {
-	                  0.0, -1.0 / ratio_y, yMax
-	            }
-	      });
+		double ratio_x = getWidth() / (current.getMaxX() - current.getMinX());
+		double ratio_y = getHeight() / (current.getMaxY() - current.getMinY());
+		toWindow = new Matrix(new double[][] { { ratio_x, 0.0, -ratio_x * current.getMinX() },
+				{ 0.0, -ratio_y, ratio_y * current.getMaxY() } });
+		toGraph = new Matrix(new double[][] { { 1.0 / ratio_x, 0.0, current.getMinX() },
+				{ 0.0, -1.0 / ratio_y, current.getMaxY() } });
 	}
 
-	public void setCoordinate(MouseEvent e) {
+	public void setMouse(MouseEvent e) {
 		mouse = toGraph(new Vector2D(e.getX(), e.getY()));
 	}
 
 	@Override
 	public void componentHidden(ComponentEvent e) {
+		repaint();
 	}
 
 	@Override
 	public void componentMoved(ComponentEvent e) {
+		repaint();
 	}
 
 	@Override
@@ -163,75 +147,83 @@ public class JGraph extends JPanel implements ComponentListener,
 
 	@Override
 	public void componentShown(ComponentEvent e) {
+		repaint();
 	}
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
 		if (isZoom) {
-			setCoordinate(e);
+			double scale = 1.0 + Math.abs(e.getWheelRotation() * 0.1);
+			if (e.getWheelRotation() < 0.0)
+				scale = 1.0 / scale;
 
-			double scale = -e.getWheelRotation() * 2.0;
-			if (scale == 0.0)
-				scale = 1.0;
-			else if (scale < 0.0)
-				scale = -1.0 / scale;
+			double xMinDist = mouse.getX() - current.getMinX();
+			double xMaxDist = current.getMaxX() - mouse.getX();
 
-			double xMinDist = mouse.getX() - xMin;
-			double xMaxDist = xMax - mouse.getX();
+			double yMinDist = mouse.getY() - current.getMinY();
+			double yMaxDist = current.getMaxY() - mouse.getY();
 
-			double yMinDist = mouse.getY() - yMin;
-			double yMaxDist = yMax - mouse.getY();
+			xMinDist *= scale;
+			xMaxDist *= scale;
 
-			xMinDist /= scale;
-			xMaxDist /= scale;
+			yMinDist *= scale;
+			yMaxDist *= scale;
 
-			yMinDist /= scale;
-			yMaxDist /= scale;
-
-			xMin = mouse.getX() - xMinDist;
-			xMax = mouse.getX() + xMaxDist;
-
-			yMin = mouse.getY() - yMinDist;
-			yMax = mouse.getY() + yMaxDist;
-
-			setTransformations();
-			repaint();
+			current.set(mouse.getX() - xMinDist, mouse.getX() + xMaxDist, mouse.getY() - yMinDist, mouse.getY()
+					+ yMaxDist);
+			setMouse(e);
 		}
 	}
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		setCoordinate(e);
-		repaint();
+		if (mouse != null && isDrag) {
+			double deltaX = mouse.getX();
+			double deltaY = mouse.getY();
+			setMouse(e);
+			deltaX -= mouse.getX();
+			deltaY -= mouse.getY();
+
+			current.set(current.getMinX() + deltaX, current.getMaxX() + deltaX, current.getMinY() + deltaY, current
+					.getMaxY()
+					+ deltaY);
+			setMouse(e);
+		}
 	}
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		setCoordinate(e);
+		setMouse(e);
 		repaint();
 	}
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		if (e.getKeyCode() == 17)
+		if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
 			isZoom = true;
-		if (e.getKeyChar() == 'r') {
-
-			// reset scale
-
-			setTransformations();
-			repaint();
-			isZoom = false;
+		} else if (e.getKeyCode() == KeyEvent.VK_ALT) {
+			isDrag = true;
+		} else if (e.getKeyChar() == 'r') {
+			current.set(original.getMinX(), original.getMaxX(), original.getMinY(), original.getMaxY());
 		}
 	}
 
 	@Override
 	public void keyReleased(KeyEvent e) {
-		if (e.getKeyCode() == 17)
+		if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
 			isZoom = false;
+		} else if (e.getKeyCode() == KeyEvent.VK_ALT) {
+			isDrag = false;
+		}
 	}
 
 	@Override
 	public void keyTyped(KeyEvent e) {
+	}
+
+	@Override
+	public void publishGraphDims() {
+		setTransformations();
+		repaint();
 	}
 }
