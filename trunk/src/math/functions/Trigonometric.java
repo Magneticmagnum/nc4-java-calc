@@ -5,11 +5,11 @@ package math.functions;
 public abstract class Trigonometric extends Function {
 
    // FORM: A * sin(omega * t + theta)
-   public static Function createSinusoid(final double A, final double omega, final double theta) {
+   public static Function createSinusoid(final double A, final double omega, final double phi) {
       return new Trigonometric() {
          @Override
          public double f(double t) {
-            return A * Math.sin(omega * t + theta);
+            return A * Math.sin(omega * t + phi);
          }
       };
    }
