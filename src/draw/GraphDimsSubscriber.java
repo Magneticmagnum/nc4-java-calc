@@ -1,7 +1,7 @@
 package draw;
 
 public interface GraphDimsSubscriber {
-	
-	public void publishGraphDims();
+
+   public void publishGraphDims();
 
 }

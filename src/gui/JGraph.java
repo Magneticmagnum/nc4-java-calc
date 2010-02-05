@@ -9,6 +9,7 @@ import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
@@ -19,211 +20,226 @@ import javax.swing.JPanel;
 
 import math.functions.Function;
 import math.matrices.Matrix;
+import math.plot.Plot;
 import draw.GraphDims;
-import draw.IGraph;
 import draw.GraphDimsSubscriber;
+import draw.IGraph;
 import draw.Vector2D;
 
-public class JGraph extends JPanel implements ComponentListener, MouseWheelListener, MouseMotionListener, KeyListener,
-		GraphDimsSubscriber {
+public class JGraph extends JPanel implements GraphDimsSubscriber, ComponentListener, MouseListener,
+      MouseMotionListener, MouseWheelListener, KeyListener {
 
-	private static final long serialVersionUID = 3725534931202232960L;
-	private JLabel xLabel;
-	private JLabel ylabel;
+   private static final long    serialVersionUID = 3725534931202232960L;
 
-	private Vector2D mouse = null;
 
-	private boolean isZoom = false;
-	private boolean isDrag = false;
+   private static DecimalFormat oneDForm         = new DecimalFormat("0.000");
 
-	private Matrix toWindow;
-	private Matrix toGraph;
+   private JLabel               xLabel;
+   private JLabel               ylabel;
 
-	private IGraph graph;
-	private GraphDims original;
-	private GraphDims current;
+   private Vector2D             mouse            = null;
 
-	public JGraph(IGraph graph, GraphDims dimensions) {
-		this.original = dimensions.copy();
-		this.current = dimensions;
-		current.addSubscriber(this);
-		this.graph = graph;
+   private Matrix               toWindow;
+   private Matrix               toGraph;
 
-		xLabel = new JLabel();
-		ylabel = new JLabel();
+   private IGraph<Vector2D>     graph;
+   private GraphDims            original;
+   private GraphDims            current;
 
-		setLayout(new BorderLayout());
-		setFocusable(true);
-		setBackground(Color.WHITE);
-		setTransformations();
+   public JGraph(IGraph<Vector2D> graph, GraphDims dimensions) {
+      this.original = dimensions.copy();
+      this.current = dimensions;
+      this.current.addSubscriber(this);
+      this.graph = graph;
 
-		addComponentListener(this);
-		add(xLabel, BorderLayout.NORTH);
-		add(ylabel, BorderLayout.EAST);
-		addMouseWheelListener(this);
-		addMouseMotionListener(this);
-		addKeyListener(this);
-		addComponentListener(this);
+      setTransformations();
 
-		repaint();
-	}
+      this.xLabel = new JLabel();
+      this.ylabel = new JLabel();
+      add(xLabel, BorderLayout.NORTH);
+      add(ylabel, BorderLayout.EAST);
 
-	@Override
-	public void paint(Graphics grid) {
-		super.paint(grid);
-		Graphics2D g = (Graphics2D) grid;
-		DecimalFormat oneDForm = new DecimalFormat("0.000");
-		if (mouse != null) {
-			xLabel.setText(String.valueOf(oneDForm.format(mouse.getY())));
-			ylabel.setText(String.valueOf(oneDForm.format(mouse.getX())));
-		}
-		drawXYAxis(g);
+      setLayout(new BorderLayout());
+      setFocusable(true);
+      setBackground(Color.WHITE);
 
-		for (Function f : graph.getFunctions())
-			draw(g, f);
-	}
+      addMouseListener(this);
+      addMouseMotionListener(this);
+      addMouseWheelListener(this);
+      addKeyListener(this);
+      addComponentListener(this);
 
-	private void drawXYAxis(Graphics g) {
-		g.setColor(Color.black); // axis color
-		drawLine(g, new Vector2D(current.getMinX(), 0), new Vector2D(current.getMaxX(), 0)); // x-axis
-		drawLine(g, new Vector2D(0, current.getMinY()), new Vector2D(0, current.getMaxY())); // y-axis
-	}
+      repaint();
+   }
 
-	private void drawLine(Graphics g, Vector2D p1, Vector2D p2) {
-		p1 = toWindow(p1);
-		p2 = toWindow(p2);
-		g.drawLine((int) p1.getX(), (int) p1.getY(), (int) p2.getX(), (int) p2.getY());
-	}
+   @Override
+   public void paint(Graphics grid) {
+      super.paint(grid);
+      Graphics2D g = (Graphics2D) grid;
+      if (mouse != null) {
+         xLabel.setText(oneDForm.format(mouse.getY()));
+         ylabel.setText(oneDForm.format(mouse.getX()));
+      }
+      drawXYAxis(g);
 
-	private void draw(Graphics g, Function f) {
-		double dx = (current.getMaxX() - current.getMinX()) / getWidth() * 2.0;
+      for (Function f : graph.getFunctions())
+         draw(g, f);
+      for (Plot<Vector2D> plot : graph.getPlots())
+         draw(g, plot);
+   }
 
-		Vector2D prev = new Vector2D(current.getMinX(), f.f(current.getMinX()));
-		for (double x = current.getMinX() + dx; x <= current.getMaxX() + dx; x += dx) {
-			Vector2D next = new Vector2D(x, f.f(x));
-			if (!(Double.isInfinite(prev.getY()) || Double.isNaN(prev.getY()) || Double.isInfinite(next.getY()) || Double
-					.isNaN(next.getY())))
-				drawLine(g, prev, next);
-			prev = next;
-		}
-	}
+   private void drawXYAxis(Graphics g) {
+      g.setColor(Color.black); // axis color
+      drawLine(g, new Vector2D(current.getMinX(), 0), new Vector2D(current.getMaxX(), 0)); // x-axis
+      drawLine(g, new Vector2D(0, current.getMinY()), new Vector2D(0, current.getMaxY())); // y-axis
+   }
 
-	public Vector2D toWindow(Vector2D v) {
-		return v.transform(toWindow);
-	}
+   private void draw(Graphics g, Function f) {
+      double dx = (current.getMaxX() - current.getMinX()) / (getWidth() * 2.0);
 
-	public Vector2D toGraph(Vector2D v) {
-		return v.transform(toGraph);
-	}
+      Vector2D prev = new Vector2D(current.getMinX(), f.f(current.getMinX()));
+      for (double x = current.getMinX() + dx; x <= current.getMaxX() + dx; x += dx) {
+         Vector2D next = new Vector2D(x, f.f(x));
+         if (!(Double.isInfinite(prev.getY()) || Double.isInfinite(next.getY()) || Double.isNaN(prev.getY()) || Double
+               .isNaN(next.getY())))
+            drawLine(g, prev, next);
+         prev = next;
+      }
+   }
 
-	private void setTransformations() {
-		double ratio_x = getWidth() / (current.getMaxX() - current.getMinX());
-		double ratio_y = getHeight() / (current.getMaxY() - current.getMinY());
-		toWindow = new Matrix(new double[][] { { ratio_x, 0.0, -ratio_x * current.getMinX() },
-				{ 0.0, -ratio_y, ratio_y * current.getMaxY() } });
-		toGraph = new Matrix(new double[][] { { 1.0 / ratio_x, 0.0, current.getMinX() },
-				{ 0.0, -1.0 / ratio_y, current.getMaxY() } });
-	}
+   private void draw(Graphics g, Plot<Vector2D> plot) {
+      for (Vector2D point : plot.getData())
+         fillOval(g, point);
+   }
 
-	public void setMouse(MouseEvent e) {
-		mouse = toGraph(new Vector2D(e.getX(), e.getY()));
-	}
+   private void drawLine(Graphics g, Vector2D p1, Vector2D p2) {
+      p1 = toWindow(p1);
+      p2 = toWindow(p2);
+      g.drawLine((int) p1.getX(), (int) p1.getY(), (int) p2.getX(), (int) p2.getY());
+   }
 
-	@Override
-	public void componentHidden(ComponentEvent e) {
-		repaint();
-	}
+   private void fillOval(Graphics g, Vector2D p) {
+      p = toWindow(p);
+      g.fillOval((int) p.getX() - 2, (int) p.getY() - 2, 4, 4);
+   }
 
-	@Override
-	public void componentMoved(ComponentEvent e) {
-		repaint();
-	}
+   public Vector2D toWindow(Vector2D v) {
+      return v.transform(toWindow);
+   }
 
-	@Override
-	public void componentResized(ComponentEvent e) {
-		setTransformations();
-		repaint();
-	}
+   public Vector2D toGraph(Vector2D v) {
+      return v.transform(toGraph);
+   }
 
-	@Override
-	public void componentShown(ComponentEvent e) {
-		repaint();
-	}
+   private void setTransformations() {
+      double ratio_x = getWidth() / (current.getMaxX() - current.getMinX());
+      double ratio_y = getHeight() / (current.getMaxY() - current.getMinY());
+      toWindow = new Matrix(new double[][] { { ratio_x, 0.0, -ratio_x * current.getMinX() },
+            { 0.0, -ratio_y, ratio_y * current.getMaxY() } });
+      toGraph = new Matrix(new double[][] { { 1.0 / ratio_x, 0.0, current.getMinX() },
+            { 0.0, -1.0 / ratio_y, current.getMaxY() } });
+   }
 
-	@Override
-	public void mouseWheelMoved(MouseWheelEvent e) {
-		if (isZoom) {
-			double scale = 1.0 + Math.abs(e.getWheelRotation() * 0.1);
-			if (e.getWheelRotation() < 0.0)
-				scale = 1.0 / scale;
+   private void setMouse(MouseEvent e) {
+      mouse = toGraph(new Vector2D(e.getX(), e.getY()));
+   }
 
-			double xMinDist = mouse.getX() - current.getMinX();
-			double xMaxDist = current.getMaxX() - mouse.getX();
+   @Override
+   public void publishGraphDims() {
+      setTransformations();
+      repaint();
+   }
 
-			double yMinDist = mouse.getY() - current.getMinY();
-			double yMaxDist = current.getMaxY() - mouse.getY();
+   @Override
+   public void componentHidden(ComponentEvent e) {
+      repaint();
+   }
 
-			xMinDist *= scale;
-			xMaxDist *= scale;
+   @Override
+   public void componentMoved(ComponentEvent e) {
+      repaint();
+   }
 
-			yMinDist *= scale;
-			yMaxDist *= scale;
+   @Override
+   public void componentResized(ComponentEvent e) {
+      setTransformations();
+      repaint();
+   }
 
-			current.set(mouse.getX() - xMinDist, mouse.getX() + xMaxDist, mouse.getY() - yMinDist, mouse.getY()
-					+ yMaxDist);
-			setMouse(e);
-		}
-	}
+   @Override
+   public void componentShown(ComponentEvent e) {
+      repaint();
+   }
 
-	@Override
-	public void mouseDragged(MouseEvent e) {
-		if (mouse != null && isDrag) {
-			double deltaX = mouse.getX();
-			double deltaY = mouse.getY();
-			setMouse(e);
-			deltaX -= mouse.getX();
-			deltaY -= mouse.getY();
+   @Override
+   public void mouseClicked(MouseEvent e) {
+      requestFocusInWindow(true);
+   }
 
-			current.set(current.getMinX() + deltaX, current.getMaxX() + deltaX, current.getMinY() + deltaY, current
-					.getMaxY()
-					+ deltaY);
-			setMouse(e);
-		}
-	}
+   @Override
+   public void mouseEntered(MouseEvent e) {
+   }
 
-	@Override
-	public void mouseMoved(MouseEvent e) {
-		setMouse(e);
-		repaint();
-	}
+   @Override
+   public void mouseExited(MouseEvent e) {
+   }
 
-	@Override
-	public void keyPressed(KeyEvent e) {
-		if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
-			isZoom = true;
-		} else if (e.getKeyCode() == KeyEvent.VK_ALT) {
-			isDrag = true;
-		} else if (e.getKeyChar() == 'r') {
-			current.set(original.getMinX(), original.getMaxX(), original.getMinY(), original.getMaxY());
-		}
-	}
+   @Override
+   public void mousePressed(MouseEvent e) {
+   }
 
-	@Override
-	public void keyReleased(KeyEvent e) {
-		if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
-			isZoom = false;
-		} else if (e.getKeyCode() == KeyEvent.VK_ALT) {
-			isDrag = false;
-		}
-	}
+   @Override
+   public void mouseReleased(MouseEvent e) {
+   }
 
-	@Override
-	public void keyTyped(KeyEvent e) {
-	}
+   @Override
+   public void mouseDragged(MouseEvent e) {
+      if (mouse != null) {
+         double dX = mouse.getX();
+         double dY = mouse.getY();
+         setMouse(e);
+         dX -= mouse.getX();
+         dY -= mouse.getY();
 
-	@Override
-	public void publishGraphDims() {
-		setTransformations();
-		repaint();
-	}
+         current.set(current.getMinX() + dX, current.getMaxX() + dX, current.getMinY() + dY, current.getMaxY() + dY);
+         setMouse(e);
+      }
+      requestFocusInWindow(true);
+   }
+
+   @Override
+   public void mouseMoved(MouseEvent e) {
+      setMouse(e);
+      repaint();
+   }
+
+   @Override
+   public void mouseWheelMoved(MouseWheelEvent e) {
+      setMouse(e);
+      double scale = 1.0 + Math.abs(e.getWheelRotation() * 0.1);
+      if (e.getWheelRotation() < 0.0)
+         scale = 1.0 / scale;
+
+      double minX = mouse.getX() - (mouse.getX() - current.getMinX()) * scale;
+      double maxX = mouse.getX() + (current.getMaxX() - mouse.getX()) * scale;
+      double minY = mouse.getY() - (mouse.getY() - current.getMinY()) * scale;
+      double maxY = mouse.getY() + (current.getMaxY() - mouse.getY()) * scale;
+
+      current.set(minX, maxX, minY, maxY);
+   }
+
+   @Override
+   public void keyPressed(KeyEvent e) {
+      if (e.getKeyChar() == 'r') {
+         current.set(original.getMinX(), original.getMaxX(), original.getMinY(), original.getMaxY());
+      }
+   }
+
+   @Override
+   public void keyReleased(KeyEvent e) {
+   }
+
+   @Override
+   public void keyTyped(KeyEvent e) {
+   }
 }

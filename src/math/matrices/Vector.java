@@ -7,8 +7,8 @@ public class Vector extends Matrix {
    /**
     * Determines if a deserialized file is compatible with {@code this class}. <br>
     * <br>
-    * Maintainers must change this value if and only if the new version of {@code this class} is not
-    * compatible with old versions.
+    * Maintainers must change this value if and only if the new version of {@code this class} is not compatible with old
+    * versions.
     */
    private static final long serialVersionUID = -4882635154030276051L;
 
@@ -35,7 +35,7 @@ public class Vector extends Matrix {
 
 
    public int getLength() {
-      return getRows();
+      return super.getRows();
    }
 
    public double get(int i) {

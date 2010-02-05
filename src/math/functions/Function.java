@@ -11,11 +11,11 @@ public abstract class Function {
    /**
     * Defines a mathematical relationship between an input and an output.
     * 
-    * @param n
+    * @param x
     *           input number
     * @return output number
     */
-   public abstract double f(double n);
+   public abstract double f(double x);
 
 
    // BORED document: Function#add(Function)
@@ -27,8 +27,8 @@ public abstract class Function {
    public static final Function add(final Function f, final double a) {
       return new Function() {
          @Override
-         public double f(double n) {
-            return a + f.f(n);
+         public double f(double x) {
+            return a + f.f(x);
          }
       };
    }
@@ -42,8 +42,8 @@ public abstract class Function {
    public static final Function add(final Function f, final Function g) {
       return new Function() {
          @Override
-         public double f(double n) {
-            return f.f(n) + g.f(n);
+         public double f(double x) {
+            return f.f(x) + g.f(x);
          }
       };
    }
@@ -62,8 +62,8 @@ public abstract class Function {
    public static final Function subtract(final Function f, final Function g) {
       return new Function() {
          @Override
-         public double f(double n) {
-            return f.f(n) - g.f(n);
+         public double f(double x) {
+            return f.f(x) - g.f(x);
          }
       };
    }
@@ -77,8 +77,8 @@ public abstract class Function {
    public static final Function multiply(final Function f, final double a) {
       return new Function() {
          @Override
-         public double f(double n) {
-            return a * f.f(n);
+         public double f(double x) {
+            return a * f.f(x);
          }
       };
    }
@@ -92,8 +92,8 @@ public abstract class Function {
    public static final Function multiply(final Function f, final Function g) {
       return new Function() {
          @Override
-         public double f(double n) {
-            return f.f(n) * g.f(n);
+         public double f(double x) {
+            return f.f(x) * g.f(x);
          }
       };
    }
@@ -112,23 +112,23 @@ public abstract class Function {
    public static final Function divide(final Function f, final Function g) {
       return new Function() {
          @Override
-         public double f(double n) {
-            return f.f(n) / g.f(n);
+         public double f(double x) {
+            return f.f(x) / g.f(x);
          }
       };
    }
 
    // BORED document: Function#composite(Function)
-   public Function composite(final Function f) {
-      return Function.composite(this, f);
+   public Function composite(final Function g) {
+      return Function.composite(this, g);
    }
 
    // BORED document: Function#composite(Function, Function)
    public static final Function composite(final Function f, final Function g) {
       return new Function() {
          @Override
-         public double f(double n) {
-            return f.f(g.f(n));
+         public double f(double x) {
+            return f.f(g.f(x));
          }
       };
    }

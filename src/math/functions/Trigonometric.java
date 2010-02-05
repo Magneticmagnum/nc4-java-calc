@@ -4,7 +4,14 @@ package math.functions;
 //BORED document: Trigonometric
 public abstract class Trigonometric extends Function {
 
-   // FORM: A * sin(omega * t + theta)
+   /**
+    * Creates a new function of the form: A * sin(omega * t + phi).
+    * 
+    * @param A
+    * @param omega
+    * @param phi
+    * @return
+    */
    public static Function createSinusoid(final double A, final double omega, final double phi) {
       return new Trigonometric() {
          @Override
