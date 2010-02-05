@@ -4,85 +4,85 @@ import java.util.LinkedList;
 
 public class GraphDims implements GraphDimsPublisher {
 
-	private double minX;
-	private double maxX;
+   private double                          minX;
+   private double                          maxX;
+   private double                          minY;
+   private double                          maxY;
 
-	private double minY;
-	private double maxY;
+   private LinkedList<GraphDimsSubscriber> subscribers;
 
-	private LinkedList<GraphDimsSubscriber> subscribers;
+   public GraphDims(double minX, double maxX, double minY, double maxY) {
+      this.subscribers = new LinkedList<GraphDimsSubscriber>();
+      set(minX, maxX, minY, maxY);
+   }
 
-	public GraphDims(double minX, double maxX, double minY, double maxY) {
-		this.subscribers = new LinkedList<GraphDimsSubscriber>();
-		set(minX, maxX, minY, maxY);
-	}
+   public GraphDims(GraphDims dims) {
+      this(dims.getMinX(), dims.getMaxX(), dims.getMinY(), dims.getMaxY());
+   }
 
-	public GraphDims(GraphDims dims) {
-		this(dims.getMinX(), dims.getMaxX(), dims.getMinY(), dims.getMaxY());
-	}
+   public void set(double minX, double maxX, double minY, double maxY) {
+      this.minX = minX;
+      this.maxX = maxX;
+      this.minY = minY;
+      this.maxY = maxY;
+      publish();
+   }
 
-	public void set(double minX, double maxX, double minY, double maxY) {
-		this.minX = minX;
-		this.maxX = maxX;
-		this.minY = minY;
-		this.maxY = maxY;
-		publish();
-	}
+   public double getMinX() {
+      return minX;
+   }
 
-	@Override
-	public void addSubscriber(GraphDimsSubscriber s) {
-		if (s != null)
-			subscribers.add(s);
-	}
+   public void setMinX(double newMinX) {
+      this.minX = newMinX;
+      publish();
+   }
 
-	@Override
-	public void removeSubscriber(GraphDimsSubscriber s) {
-		subscribers.remove(s);
-	}
+   public double getMaxX() {
+      return maxX;
+   }
 
-	private void publish() {
-		for (GraphDimsSubscriber s : subscribers)
-			s.publishGraphDims();
-	}
+   public void setMaxX(double newMaxX) {
+      this.maxX = newMaxX;
+      publish();
+   }
 
-	public double getMinX() {
-		return minX;
-	}
+   public double getMinY() {
+      return minY;
+   }
 
-	public void setMinX(double newMinX) {
-		this.minX = newMinX;
-		publish();
-	}
+   public void setMinY(double newMinY) {
+      this.minY = newMinY;
+      publish();
+   }
 
-	public double getMaxX() {
-		return maxX;
-	}
+   public double getMaxY() {
+      return maxY;
+   }
 
-	public void setMaxX(double newMaxX) {
-		this.maxX = newMaxX;
-		publish();
-	}
+   public void setMaxY(double newMaxY) {
+      this.maxY = newMaxY;
+      publish();
+   }
 
-	public double getMinY() {
-		return minY;
-	}
+   @Override
+   public void addSubscriber(GraphDimsSubscriber s) {
+      if (s != null) {
+         subscribers.add(s);
+      }
+   }
 
-	public void setMinY(double newMinY) {
-		this.minY = newMinY;
-		publish();
-	}
+   @Override
+   public void removeSubscriber(GraphDimsSubscriber s) {
+      subscribers.remove(s);
+   }
 
-	public double getMaxY() {
-		return maxY;
-	}
+   private void publish() {
+      for (GraphDimsSubscriber s : subscribers)
+         s.publishGraphDims();
+   }
 
-	public void setMaxY(double newMaxY) {
-		this.maxY = newMaxY;
-		publish();
-	}
-
-	public GraphDims copy() {
-		return new GraphDims(this);
-	}
+   public GraphDims copy() {
+      return new GraphDims(this);
+   }
 
 }

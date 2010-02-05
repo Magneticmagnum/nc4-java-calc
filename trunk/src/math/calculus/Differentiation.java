@@ -11,8 +11,8 @@ public final class Differentiation {
    // Numerical Mathematics and Computing (6th Edition) by Ward Cheney and David Kincaid
    // Pages 172-173
    public static double derivative(Function f, double x) {
-      double h = Math.abs(x / 1000000000.0);
-      h += (h == 0.0 ? 0.0 : 0.000000001);
+      double h = Math.abs(x / 1000.0);
+      h += (h == 0.0 ? 0.0 : 0.0001);
       double xph = f.f(x + h);
       double xmh = f.f(x - h);
       return 1.0 / (2.0 * h) * (xph - xmh) - 1.0 / (12.0 * h)
@@ -63,8 +63,8 @@ public final class Differentiation {
    // Numerical Mathematics and Computing (6th Edition) by Ward Cheney and David Kincaid
    // Page 173
    public static double secondDerivative(Function f, double x) {
-      double h = Math.abs(x / 1000000000.0);
-      h += (h == 0.0 ? 0.0 : 0.000000001);
+      double h = Math.abs(x / 1000.0);
+      h += (h == 0.0 ? 0.0 : 0.0001);
       return 1.0 / (h * h) * (f.f(x + h) - 2.0 * f.f(x) + f.f(x - h));
    }
 
