@@ -1,5 +1,6 @@
 package math.functions;
 import math.functions.Function;
+import math.calculus.Differentiation;
 /**
  * @author Steve Nelson
  * Work in progress...
@@ -164,12 +165,39 @@ public final class getRoot
 	//NEWTONS METHOD FOR ROOT FINDING//////////////////////////////////////
 	public double newtons(double a,  Function f)
 	{
-		double root;
+		Function fprime = derivative(f);//NOT SURE IF IM DOING THIS CORRECTLY. 
+		int n; 
+		double gamma = .25;//minimum slope allowed. small slope = VOLATILE 
+		double eps, d, fa, fp, root;
 		
+		fa = f(a);
+		eps = machineEps();//find root within this tolerance
+		n =	convergence_newtons(a, b, eps, f);
+		
+		//output: 0, a, fa
+		for(int i = 0; i < n; i++)
+		{
+			fp = fprime(a);
+			if (Math.abs(fp) < gamma)
+			{
+				//output: probably shouldn't use newtons method at this point
+				//break;?
+			}
+			
+			d = fa/fp;
+			a -= d;
+			fa = f(a);
+			//output: n, x, fx
+			if(Math.abs(d) < eps)
+			{
+				root = a;
+				break;
+			}
+		}
 		return root;
 	}
 	public int convergence_newtons(double a, double eps, Function f)
-	{
+	{//don't totally understand how this can be derived for any function yet
 		double root;
 		
 		return root;
