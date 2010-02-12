@@ -4,7 +4,6 @@ import gui.JGraphDims;
 import javax.swing.JFrame;
 import javax.swing.JSplitPane;
 
-import math.functions.Linear;
 import math.functions.Quadratic;
 import math.functions.Trigonometric;
 import math.plot.Plot;
@@ -33,8 +32,9 @@ public class JavaCalc extends JFrame {
 
 
       IGraph<Vector2D> graph2 = new Graph<Vector2D>();
-      graph2.add(Quadratic.createPolynomial(-1.0, 2.0, 8.0));
-      graph2.add(Linear.createPointSlope(-1.0, 3.0, 2.0));
+      graph2.add(Quadratic.createFactored(-1.0, 2.0, 3.0));
+      // graph2.add(Quadratic.createPolynomial(-1.0, 2.0, 8.0));
+      // graph2.add(Linear.createPointSlope(-1.0, 3.0, 2.0));
       GraphDims dims2 = new GraphDims(-10, 10, -10, 10);
       JGraph g2 = new JGraph(graph2, dims2);
 
