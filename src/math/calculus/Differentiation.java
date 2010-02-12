@@ -5,7 +5,7 @@ import math.functions.Function;
 // BORED document: math.calculus.Differentiation
 public final class Differentiation {
 
-   public Differentiation() {
+   private Differentiation() {
    }
 
    // Numerical Mathematics and Computing (6th Edition) by Ward Cheney and David Kincaid

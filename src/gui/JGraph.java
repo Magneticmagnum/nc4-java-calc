@@ -134,10 +134,14 @@ public class JGraph extends JPanel implements GraphDimsSubscriber, ComponentList
    private void setTransformations() {
       double ratio_x = getWidth() / (current.getMaxX() - current.getMinX());
       double ratio_y = getHeight() / (current.getMaxY() - current.getMinY());
-      toWindow = new Matrix(new double[][] { { ratio_x, 0.0, -ratio_x * current.getMinX() },
-            { 0.0, -ratio_y, ratio_y * current.getMaxY() } });
-      toGraph = new Matrix(new double[][] { { 1.0 / ratio_x, 0.0, current.getMinX() },
-            { 0.0, -1.0 / ratio_y, current.getMaxY() } });
+      toWindow = new Matrix(new double[][] { 
+            { ratio_x, 0.0,    -ratio_x * current.getMinX() },
+            { 0.0,    -ratio_y, ratio_y * current.getMaxY() }
+      });
+      toGraph = new Matrix(new double[][] { 
+            { 1.0 / ratio_x, 0.0,           current.getMinX() },
+            { 0.0,          -1.0 / ratio_y, current.getMaxY() }
+      });
    }
 
    private void setMouse(MouseEvent e) {
