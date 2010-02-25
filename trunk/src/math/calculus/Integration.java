@@ -5,7 +5,7 @@ import math.functions.Function;
 // BORED document: math.calculus.Integration
 public final class Integration {
 
-   public Integration() {
+   private Integration() {
    }
 
 

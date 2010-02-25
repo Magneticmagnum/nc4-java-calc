@@ -9,14 +9,14 @@ public class Matrix implements Cloneable, Serializable {
    /**
     * Determines if a deserialized file is compatible with {@code this class}. <br>
     * <br>
-    * Maintainers must change this value if and only if the new version of {@code this class} is not
-    * compatible with old versions.
+    * Maintainers must change this value if and only if the new version of {@code this class} is not compatible with old
+    * versions.
     */
    private static final long serialVersionUID = 5433550198946185291L;
 
-   private double[][] matrix;
-   private int rows;
-   private int columns;
+   private double[][]        matrix;
+   private int               rows;
+   private int               columns;
 
 
    public Matrix() {
@@ -110,6 +110,68 @@ public class Matrix implements Cloneable, Serializable {
    }
 
 
+   public Matrix scale(double n) {
+      set(scale(n, this));
+      return this;
+   }
+
+   public static final Matrix scale(double n, Matrix a) {
+      if (a == null)
+         throw new NullPointerException("Cannot scale a null matrix.");
+      Matrix c = a.copy();
+      for (int i = 0; i < c.getRows(); i++) {
+         for (int j = 0; j < c.getColumns(); j++) {
+            c.set(i, j, n * c.get(i, j));
+         }
+      }
+      return c;
+   }
+
+
+   public Matrix dotAdd(Matrix a) {
+      set(dotAdd(this, a));
+      return this;
+   }
+
+   public static final Matrix dotAdd(Matrix a, Matrix b) {
+      if (a == null || b == null)
+         throw new NullPointerException("Cannot add null matrices.");
+      if (a.getRows() != b.getRows() || a.getColumns() != b.getColumns())
+         throw new MatrixDimensionException("Matrix dimension exception: matrix dimensions do not agree: "
+               + a.getRows() + "x" + a.getColumns() + " and " + b.getRows() + "x" + b.getColumns());
+
+      Matrix c = a.copy();
+      for (int i = 0; i < a.getRows(); i++) {
+         for (int j = 0; j < a.getColumns(); j++) {
+            c.set(i, j, a.get(i, j) + b.get(i, j));
+         }
+      }
+      return c;
+   }
+
+
+   public Matrix dotSubtract(Matrix a) {
+      set(dotSubtract(this, a));
+      return this;
+   }
+
+   public static final Matrix dotSubtract(Matrix a, Matrix b) {
+      if (a == null || b == null)
+         throw new NullPointerException("Cannot add null matrices.");
+      if (a.getRows() != b.getRows() || a.getColumns() != b.getColumns())
+         throw new MatrixDimensionException("Matrix dimension exception: matrix dimensions do not agree: "
+               + a.getRows() + "x" + a.getColumns() + " and " + b.getRows() + "x" + b.getColumns());
+
+      Matrix c = a.copy();
+      for (int i = 0; i < a.getRows(); i++) {
+         for (int j = 0; j < a.getColumns(); j++) {
+            c.set(i, j, a.get(i, j) - b.get(i, j));
+         }
+      }
+      return c;
+   }
+
+
    public Matrix multiply(Matrix b) {
       set(multiply(this, b));
       return this;
@@ -117,7 +179,7 @@ public class Matrix implements Cloneable, Serializable {
 
    public static final Matrix multiply(Matrix a, Matrix b) {
       if (a == null || b == null)
-         throw new NullPointerException("Cannot multiply a null matrices.");
+         throw new NullPointerException("Cannot multiply null matrices.");
       if (a.getColumns() != b.getRows())
          throw new MatrixDimensionException("Matrix dimension exception: matrix dimensions do not agree: "
                + a.getColumns() + " and " + b.getRows());
@@ -129,24 +191,6 @@ public class Matrix implements Cloneable, Serializable {
             for (int k = 0; k < b.getRows(); k++)
                sum += a.get(i, k) * b.get(k, j);
             c.set(i, j, sum);
-         }
-      }
-      return c;
-   }
-
-
-   public Matrix scale(double n) {
-      set(scale(n, this));
-      return this;
-   }
-
-   public static final Matrix scale(double n, Matrix a) {
-      if (a == null)
-         throw new NullPointerException("Cannot multiply a null matrices.");
-      Matrix c = a.copy();
-      for (int i = 0; i < c.getRows(); i++) {
-         for (int j = 0; j < c.getColumns(); j++) {
-            c.set(i, j, n * c.get(i, j));
          }
       }
       return c;
@@ -168,6 +212,10 @@ public class Matrix implements Cloneable, Serializable {
 
    public void print() {
       print(System.out, 10, 1);
+   }
+
+   public void print(int spacing, int decimals) {
+      print(System.out, spacing, decimals);
    }
 
    public void print(PrintStream os, int spacing, int decimals) {
