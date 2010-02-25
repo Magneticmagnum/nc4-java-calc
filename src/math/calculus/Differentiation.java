@@ -33,6 +33,11 @@ public final class Differentiation {
    }
 
 
+   public static double rechardsonExtrapolation(Function f, double x) {
+      return rechardsonExtrapolation(f, x, 10);
+
+   }
+
    // Numerical Mathematics and Computing (6th Edition) by Ward Cheney and David Kincaid
    // Page 170
    public static double rechardsonExtrapolation(Function f, double x, int n) {
