@@ -6,11 +6,11 @@ import javax.swing.JSplitPane;
 
 import math.functions.Quadratic;
 import math.functions.Trigonometric;
-import math.plot.Plot;
-import draw.Graph;
-import draw.GraphDims;
-import draw.IGraph;
-import draw.Vector2D;
+import math.graph.Graph;
+import math.graph.GraphDims;
+import math.graph.IGraph;
+import math.graph.Plot;
+import math.matrices.Vector2D;
 
 @SuppressWarnings("serial")
 public class JavaCalc extends JFrame {

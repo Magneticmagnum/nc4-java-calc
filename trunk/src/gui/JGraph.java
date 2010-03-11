@@ -19,12 +19,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import math.functions.Function;
+import math.graph.GraphDims;
+import math.graph.GraphDimsSubscriber;
+import math.graph.IGraph;
+import math.graph.Plot;
 import math.matrices.Matrix;
-import math.plot.Plot;
-import draw.GraphDims;
-import draw.GraphDimsSubscriber;
-import draw.IGraph;
-import draw.Vector2D;
+import math.matrices.Vector2D;
 
 public class JGraph extends JPanel implements GraphDimsSubscriber, ComponentListener, MouseListener,
       MouseMotionListener, MouseWheelListener, KeyListener {

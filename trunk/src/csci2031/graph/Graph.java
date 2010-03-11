@@ -13,8 +13,8 @@ import javax.swing.JPanel;
 import math.functions.Function;
 import math.matrices.Matrix;
 import math.matrices.Vector;
+import math.matrices.Vector2D;
 import csci2031.math.Parametric;
-import draw.Vector2D;
 
 public class Graph extends JPanel implements ComponentListener {
 

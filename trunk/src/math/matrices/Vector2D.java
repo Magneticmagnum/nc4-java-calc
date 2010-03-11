@@ -1,8 +1,6 @@
-package draw;
+package math.matrices;
 
-import math.matrices.Matrix;
-import math.matrices.Vector;
-import math.plot.Plotable;
+import math.graph.Plotable;
 
 // BORED document: draw.Vector2D
 public class Vector2D extends Vector implements Plotable {

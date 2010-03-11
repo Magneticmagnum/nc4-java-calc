@@ -3,8 +3,8 @@ package csci2031.math;
 import java.util.List;
 
 import math.functions.Function;
+import math.matrices.Vector2D;
 import csci2031.graph.UserPoints;
-import draw.Vector2D;
 
 public class Spline {
 

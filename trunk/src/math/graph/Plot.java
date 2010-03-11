@@ -1,4 +1,4 @@
-package math.plot;
+package math.graph;
 
 import java.util.Collection;
 import java.util.LinkedList;

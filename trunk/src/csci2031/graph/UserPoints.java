@@ -9,9 +9,9 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 
+import math.Utils;
 import math.matrices.Vector;
-import csci2031.math.Utils;
-import draw.Vector2D;
+import math.matrices.Vector2D;
 
 public class UserPoints implements GraphComponent, MouseListener, MouseMotionListener, KeyListener {
 
