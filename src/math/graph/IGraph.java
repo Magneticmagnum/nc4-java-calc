@@ -1,10 +1,8 @@
-package draw;
+package math.graph;
 
 import java.util.List;
 
 import math.functions.Function;
-import math.plot.Plot;
-import math.plot.Plotable;
 
 public interface IGraph<E extends Plotable> {
 

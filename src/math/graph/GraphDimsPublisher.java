@@ -1,4 +1,4 @@
-package draw;
+package math.graph;
 
 public interface GraphDimsPublisher {
 

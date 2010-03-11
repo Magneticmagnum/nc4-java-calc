@@ -1,4 +1,4 @@
-package math.plot;
+package math.graph;
 
 public interface Plotable {
 

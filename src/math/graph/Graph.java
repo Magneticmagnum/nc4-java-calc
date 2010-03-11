@@ -1,11 +1,9 @@
-package draw;
+package math.graph;
 
 import java.util.LinkedList;
 import java.util.List;
 
 import math.functions.Function;
-import math.plot.Plot;
-import math.plot.Plotable;
 
 public class Graph<E extends Plotable> implements IGraph<E> {
 

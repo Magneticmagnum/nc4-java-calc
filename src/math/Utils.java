@@ -54,7 +54,7 @@ public class Utils {
 
    public static final double pow(int a, int n) {
       if (n < 0)
-         throw new ArithmeticException("Can not raise an integer to a negative number.");
+         throw new ArithmeticException("Cannot raise an integer to a negative number.");
       int t = 1;
       for (int i = Math.abs(n); i > 0; i--)
          t *= a;
@@ -63,7 +63,7 @@ public class Utils {
 
    public static final int factorial(int n) {
       if (n < 0)
-         throw new ArithmeticException("Can not take the factorial of a negative number.");
+         throw new ArithmeticException("Cannot take the factorial of a negative number.");
       int t = 1;
       for (int i = n; i > 0; i--)
          t *= i;
