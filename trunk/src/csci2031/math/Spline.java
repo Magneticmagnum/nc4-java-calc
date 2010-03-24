@@ -1,9 +1,10 @@
 package csci2031.math;
 
+import graphics.Vector2D;
+
 import java.util.List;
 
 import math.functions.Function;
-import math.matrices.Vector2D;
 import csci2031.graph.UserPoints;
 
 public class Spline {
