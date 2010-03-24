@@ -1,5 +1,7 @@
 package csci2031.graph;
 
+import graphics.Vector2D;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -13,7 +15,6 @@ import javax.swing.JPanel;
 import math.functions.Function;
 import math.matrices.Matrix;
 import math.matrices.Vector;
-import math.matrices.Vector2D;
 import csci2031.math.Parametric;
 
 public class Graph extends JPanel implements ComponentListener {

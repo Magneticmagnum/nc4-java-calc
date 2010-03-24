@@ -1,3 +1,4 @@
+import graphics.Vector2D;
 import gui.JGraph;
 import gui.JGraphDims;
 
@@ -10,7 +11,6 @@ import math.graph.Graph;
 import math.graph.GraphDims;
 import math.graph.IGraph;
 import math.graph.Plot;
-import math.matrices.Vector2D;
 
 @SuppressWarnings("serial")
 public class JavaCalc extends JFrame {
