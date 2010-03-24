@@ -1,5 +1,7 @@
 package csci2031.graph;
 
+import graphics.Vector2D;
+
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
@@ -11,7 +13,6 @@ import java.util.ArrayList;
 
 import math.Utils;
 import math.matrices.Vector;
-import math.matrices.Vector2D;
 
 public class UserPoints implements GraphComponent, MouseListener, MouseMotionListener, KeyListener {
 
