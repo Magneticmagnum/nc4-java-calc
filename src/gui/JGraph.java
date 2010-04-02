@@ -19,9 +19,11 @@ import java.awt.event.MouseWheelListener;
 
 import javax.swing.JPanel;
 
+import math.functions.Function;
 import math.graph.GraphDims;
 import math.graph.GraphDimsSubscriber;
 import math.graph.IGraph;
+import math.graph.Plot;
 import math.matrices.Matrix;
 
 public class JGraph extends JPanel implements GraphDimsSubscriber, ComponentListener, MouseListener,
@@ -31,7 +33,6 @@ public class JGraph extends JPanel implements GraphDimsSubscriber, ComponentList
 
    private Vector2D          mouse            = null;
 
-   private Matrix            toWindow;
    private Matrix            toGraph;
 
    private IGraph<Vector2D>  graph;
@@ -62,60 +63,22 @@ public class JGraph extends JPanel implements GraphDimsSubscriber, ComponentList
    @Override
    public void paint(Graphics grid) {
       super.paint(grid);
-      Graph2D graph = new Graph2D((Graphics2D) grid, current);
-      drawXYAxis(graph);
-      
+      Graph2D graph2d = new Graph2D((Graphics2D) grid, current);
 
+      graph2d.drawXYAxis();
+      for (Function f : graph.getFunctions())
+         graph2d.drawFunction(f);
+      for (Plot<Vector2D> p : graph.getPlots())
+         graph2d.drawPlot(p);
    }
 
-   private void drawXYAxis(Graph2D g) {
-      g.setColor(Color.black); // axis color
-      g.drawLine(new Vector2D(current.getMinX(), 0), new Vector2D(current.getMaxX(), 0)); // x-axis
-      g.drawLine(new Vector2D(0, current.getMinY()), new Vector2D(0, current.getMaxY())); // y-axis
-   }
-
-//   private void draw(Graphics g, Function f) {
-//      double dx = (current.getMaxX() - current.getMinX()) / (getWidth() * 2.0);
-//
-//      Vector2D prev = new Vector2D(current.getMinX(), f.f(current.getMinX()));
-//      for (double x = current.getMinX() + dx; x <= current.getMaxX() + dx; x += dx) {
-//         Vector2D next = new Vector2D(x, f.f(x));
-//         if (!(Double.isInfinite(prev.getY()) || Double.isInfinite(next.getY()) || Double.isNaN(prev.getY()) || Double
-//               .isNaN(next.getY())))
-//            drawLine(g, prev, next);
-//         prev = next;
-//      }
-//   }
-
-//   private void draw(Graphics g, Plot<Vector2D> plot) {
-//      for (Vector2D point : plot.getData())
-//         fillOval(g, point);
-//   }
-
-//   private void drawLine(Graphics g, Vector2D p1, Vector2D p2) {
-//      p1 = toWindow(p1);
-//      p2 = toWindow(p2);
-//      g.drawLine((int) p1.getX(), (int) p1.getY(), (int) p2.getX(), (int) p2.getY());
-//   }
-
-//   private void fillOval(Graphics g, Vector2D p) {
-//      p = toWindow(p);
-//      g.fillOval((int) p.getX() - 2, (int) p.getY() - 2, 4, 4);
-//   }
-
-   public Vector2D toWindow(Vector2D v) {
-      return v.transform(toWindow);
-   }
-
-   public Vector2D toGraph(Vector2D v) {
+   private Vector2D toGraph(Vector2D v) {
       return v.transform(toGraph);
    }
 
    private void setTransformations() {
       double ratio_x = getWidth() / (current.getMaxX() - current.getMinX());
       double ratio_y = getHeight() / (current.getMaxY() - current.getMinY());
-      toWindow = new Matrix(new double[][] { { ratio_x, 0.0, -ratio_x * current.getMinX() },
-            { 0.0, -ratio_y, ratio_y * current.getMaxY() } });
       toGraph = new Matrix(new double[][] { { 1.0 / ratio_x, 0.0, current.getMinX() },
             { 0.0, -1.0 / ratio_y, current.getMaxY() } });
    }
@@ -125,7 +88,7 @@ public class JGraph extends JPanel implements GraphDimsSubscriber, ComponentList
    }
 
    @Override
-   public void publishGraphDims() {
+   public void updateGraphDims() {
       setTransformations();
       repaint();
    }

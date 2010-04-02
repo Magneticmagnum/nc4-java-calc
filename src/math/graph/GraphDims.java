@@ -66,9 +66,8 @@ public class GraphDims implements GraphDimsPublisher {
 
    @Override
    public void addSubscriber(GraphDimsSubscriber s) {
-      if (s != null) {
+      if (s != null)
          subscribers.add(s);
-      }
    }
 
    @Override
@@ -78,7 +77,7 @@ public class GraphDims implements GraphDimsPublisher {
 
    private void publish() {
       for (GraphDimsSubscriber s : subscribers)
-         s.publishGraphDims();
+         s.updateGraphDims();
    }
 
    public GraphDims copy() {
