@@ -84,7 +84,7 @@ public class JGraphDims extends JPanel implements GraphDimsSubscriber {
    }
 
    @Override
-   public void publishGraphDims() {
+   public void updateGraphDims() {
       minXField.setValue(dims.getMinX());
       maxXField.setValue(dims.getMaxX());
       minYField.setValue(dims.getMinY());

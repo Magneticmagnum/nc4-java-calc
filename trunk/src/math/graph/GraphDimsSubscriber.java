@@ -2,6 +2,6 @@ package math.graph;
 
 public interface GraphDimsSubscriber {
 
-   public void publishGraphDims();
+   public void updateGraphDims();
 
 }
