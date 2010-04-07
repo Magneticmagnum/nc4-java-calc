@@ -1,5 +1,7 @@
 package gui;
 
+import graphics.Vector2D;
+
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,16 +15,22 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import math.graph.IGraph;
+
 public class JFunctionList extends JPanel {
 
    private static final long          serialVersionUID = -1496183123559691747L;
 
+   private IGraph<Vector2D>           graph;
 
    private LinkedList<JFunctionPanel> functionPanels;
    private JScrollPane                functionScrollPane;
    private JButton                    addButton;
 
-   public JFunctionList() {
+
+   public JFunctionList(IGraph<Vector2D> graph) {
+      this.graph = graph;
+
       functionScrollPane = new JScrollPane();
       functionPanels = new LinkedList<JFunctionPanel>();
       addButton = new AddButton();
@@ -65,7 +73,7 @@ public class JFunctionList extends JPanel {
    }
 
    private void addFunction() {
-      functionPanels.add(new JFunctionPanel());
+      functionPanels.add(new JFunctionPanel(graph));
    }
 
 

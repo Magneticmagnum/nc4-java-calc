@@ -39,15 +39,17 @@ public class Graph2D {
    }
 
    public void drawFunction(Function f) {
-      double dx = (dims.getMaxX() - dims.getMinX()) / (getWidth() * 2.0);
+      if (f != null && !f.equals(Function.NULL_FUNCTION)) {
+         double dx = (dims.getMaxX() - dims.getMinX()) / (getWidth() * 2.0);
 
-      Vector2D prev = new Vector2D(dims.getMinX(), f.f(dims.getMinX()));
-      for (double x = dims.getMinX() + dx; x <= dims.getMaxX() + dx; x += dx) {
-         Vector2D next = new Vector2D(x, f.f(x));
-         if (!(Double.isInfinite(prev.getY()) || Double.isInfinite(next.getY()) || Double.isNaN(prev.getY()) || Double
-               .isNaN(next.getY())))
-            drawLine(prev, next);
-         prev = next;
+         Vector2D prev = new Vector2D(dims.getMinX(), f.f(dims.getMinX()));
+         for (double x = dims.getMinX() + dx; x <= dims.getMaxX() + dx; x += dx) {
+            Vector2D next = new Vector2D(x, f.f(x));
+            if (!(Double.isInfinite(prev.getY()) || Double.isInfinite(next.getY()) || Double.isNaN(prev.getY()) || Double
+                  .isNaN(next.getY())))
+               drawLine(prev, next);
+            prev = next;
+         }
       }
    }
 
