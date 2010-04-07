@@ -8,6 +8,20 @@ package math.functions;
  */
 public abstract class Function {
 
+   public static final Function NULL_FUNCTION = new Function() {
+                                                 @Override
+                                                 public double f(double x) {
+                                                    return Double.NaN;
+                                                 }
+                                              };
+
+   private double               UID;
+
+   public Function() {
+      UID = Math.random();
+   }
+
+
    /**
     * Defines a mathematical relationship between an input and an output.
     * 
@@ -131,6 +145,15 @@ public abstract class Function {
             return f.f(g.f(x));
          }
       };
+   }
+
+   @Override
+   public boolean equals(Object obj) {
+      if (obj instanceof Function) {
+         Function func = (Function) obj;
+         return this.UID == func.UID;
+      }
+      return super.equals(obj);
    }
 
 }

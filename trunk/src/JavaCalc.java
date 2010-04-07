@@ -1,16 +1,21 @@
 import graphics.Vector2D;
+import gui.JFunctionList;
 import gui.JGraph;
 import gui.JGraphDims;
 
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
-import math.functions.Quadratic;
-import math.functions.Trigonometric;
 import math.graph.Graph;
 import math.graph.GraphDims;
 import math.graph.IGraph;
-import math.graph.Plot;
 
 @SuppressWarnings("serial")
 public class JavaCalc extends JFrame {
@@ -18,34 +23,31 @@ public class JavaCalc extends JFrame {
    public static void main(String[] args) {
       JavaCalc calc = new JavaCalc();
 
+      IGraph<Vector2D> graph = new Graph<Vector2D>();
+      JFunctionList funcList = new JFunctionList(graph);
+      final GraphDims dims = new GraphDims(-10, 10, -10, 10);
 
-      IGraph<Vector2D> graph1 = new Graph<Vector2D>();
-      graph1.add(Trigonometric.createSinusoid(-3.0, 1.0, 0.0));
-      Plot<Vector2D> p = new Plot<Vector2D>();
-      p.add(new Vector2D(2.0, 2.0));
-      p.add(new Vector2D(2.0, -2.0));
-      p.add(new Vector2D(-2.0, 2.0));
-      p.add(new Vector2D(-2.0, -2.0));
-      graph1.add(p);
-      GraphDims dims1 = new GraphDims(-10, 10, -10, 10);
-      JGraph g1 = new JGraph(graph1, dims1);
+      JGraph jGraph = new JGraph(graph, dims);
+      JButton jDims = new JButton("Set Dimensions");
+      jDims.setAlignmentX(Component.CENTER_ALIGNMENT);
+      jDims.addActionListener(new ActionListener() {
+         @Override
+         public void actionPerformed(ActionEvent e) {
+            JFrame frame = new JFrame("Graph Dimensions");
+            frame.add(new JGraphDims(dims));
+            frame.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+            frame.pack();
+            frame.setVisible(true);
+         }
+      });
 
+      JPanel panel = new JPanel();
+      panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+      panel.add(jGraph);
+      panel.add(jDims);
 
-      IGraph<Vector2D> graph2 = new Graph<Vector2D>();
-      graph2.add(Quadratic.createFactored(-1.0, 2.0, 3.0));
-      // graph2.add(Quadratic.createPolynomial(-1.0, 2.0, 8.0));
-      // graph2.add(Linear.createPointSlope(-1.0, 3.0, 2.0));
-      GraphDims dims2 = new GraphDims(-10, 10, -10, 10);
-      JGraph g2 = new JGraph(graph2, dims2);
-
-
-      JSplitPane split1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, g1, new JGraphDims(dims1));
-      JSplitPane split2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, g2, new JGraphDims(dims2));
-      split1.setDividerLocation(calc.getWidth() / 2);
-      split2.setDividerLocation(calc.getWidth() / 2);
-
-      JSplitPane splitmain = new JSplitPane(JSplitPane.VERTICAL_SPLIT, split1, split2);
-      splitmain.setDividerLocation(calc.getHeight() / 2);
+      JSplitPane splitmain = new JSplitPane(JSplitPane.VERTICAL_SPLIT, panel, funcList);
+      splitmain.setDividerLocation(400);
       calc.add(splitmain);
    }
 
@@ -53,7 +55,7 @@ public class JavaCalc extends JFrame {
       super("NCC CompClub Graphing Calculator");
 
       setDefaultCloseOperation(EXIT_ON_CLOSE);
-      setSize(1000, 1000);
+      setSize(400, 600);
       setVisible(true);
    }
 
