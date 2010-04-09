@@ -1,9 +1,9 @@
 package gui;
 
 import graphics.Graph2D;
+import graphics.Graphable;
 import graphics.Vector2D;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -16,6 +16,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.util.LinkedList;
 
 import javax.swing.JPanel;
 
@@ -29,25 +30,26 @@ import math.matrices.Matrix;
 public class JGraph extends JPanel implements GraphDimsSubscriber, ComponentListener, MouseListener,
       MouseMotionListener, MouseWheelListener, KeyListener {
 
-   private static final long serialVersionUID = 3725534931202232960L;
+   private static final long     serialVersionUID = 3725534931202232960L;
 
-   private Vector2D          mouse            = null;
+   private Vector2D              mouse            = null;
+   private Matrix                toGraph;
 
-   private Matrix            toGraph;
+   private IGraph<Vector2D>      graph;
+   private LinkedList<Graphable> graphables;
 
-   private IGraph<Vector2D>  graph;
-   private GraphDims         original;
-   private GraphDims         current;
+   private GraphDims             original;
+   private GraphDims             current;
 
    public JGraph(IGraph<Vector2D> graph, GraphDims dimensions) {
       this.original = dimensions.copy();
       this.current = dimensions;
       this.current.addSubscriber(this);
       this.graph = graph;
+      graphables = new LinkedList<Graphable>();
 
       setTransformations();
 
-      setLayout(new BorderLayout());
       setFocusable(true);
       setBackground(Color.WHITE);
 
@@ -70,6 +72,13 @@ public class JGraph extends JPanel implements GraphDimsSubscriber, ComponentList
          graph2d.drawFunction(f);
       for (Plot<Vector2D> p : graph.getPlots())
          graph2d.drawPlot(p);
+
+      for (Graphable g : graphables)
+         g.onGraph(graph2d);
+   }
+
+   public void addGraphable(Graphable graphable) {
+      graphables.add(graphable);
    }
 
    private Vector2D toGraph(Vector2D v) {
@@ -86,6 +95,7 @@ public class JGraph extends JPanel implements GraphDimsSubscriber, ComponentList
    private void setMouse(MouseEvent e) {
       mouse = toGraph(new Vector2D(e.getX(), e.getY()));
    }
+
 
    @Override
    public void updateGraphDims() {

@@ -21,8 +21,8 @@ public class Graph<E extends Plotable> implements IGraph<E> {
    }
 
    @Override
-   public void remove(Function f) {
-      functions.remove(f);
+   public boolean remove(Function f) {
+      return functions.remove(f);
    }
 
    @Override
@@ -36,8 +36,8 @@ public class Graph<E extends Plotable> implements IGraph<E> {
    }
 
    @Override
-   public void remove(Plot<E> p) {
-      plots.remove(p);
+   public boolean remove(Plot<E> p) {
+      return plots.remove(p);
    }
 
    @Override

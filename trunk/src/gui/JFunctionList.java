@@ -1,5 +1,7 @@
 package gui;
 
+import graphics.Graph2D;
+import graphics.Graphable;
 import graphics.Vector2D;
 
 import java.awt.Dimension;
@@ -17,7 +19,7 @@ import javax.swing.JScrollPane;
 
 import math.graph.IGraph;
 
-public class JFunctionList extends JPanel {
+public class JFunctionList extends JPanel implements Graphable {
 
    private static final long          serialVersionUID = -1496183123559691747L;
 
@@ -73,9 +75,17 @@ public class JFunctionList extends JPanel {
    }
 
    private void addFunction() {
-      functionPanels.add(new JFunctionPanel(graph));
+      JFunctionPanel panel = new JFunctionPanel();
+      graph.add(panel.getFunction());
+      panel.addRemoveButtonActionListener(new RemoveListener(panel));
+      functionPanels.add(panel);
    }
 
+   @Override
+   public void onGraph(Graph2D graph) {
+      for (JFunctionPanel f : functionPanels)
+         f.onGraph(graph);
+   }
 
    private class AddButton extends JButton implements ActionListener {
 
@@ -88,12 +98,28 @@ public class JFunctionList extends JPanel {
 
       @Override
       public void actionPerformed(ActionEvent e) {
-         String text = functionPanels.getLast().getText();
-         if (!text.equals("")) {
+         if (functionPanels.size() == 0 || !functionPanels.getLast().getText().equals("")) {
             addFunction();
             buildScrollPaneLayout();
          }
       }
+   }
+
+   private class RemoveListener implements ActionListener {
+
+      private JFunctionPanel toRemove;
+
+      public RemoveListener(JFunctionPanel remove) {
+         this.toRemove = remove;
+      }
+
+      @Override
+      public void actionPerformed(ActionEvent e) {
+         graph.remove(toRemove.getFunction());
+         functionPanels.remove(toRemove);
+         buildScrollPaneLayout();
+      }
+
    }
 
 }
