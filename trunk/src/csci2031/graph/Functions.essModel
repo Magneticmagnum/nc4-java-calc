@@ -1,0 +1,52 @@
+[Box: ::math.calculus - ::math.calculus::Differentiation]
+X=430
+Y=40
+
+[Box: ::math.calculus - ::math.calculus::Integration]
+X=225
+Y=40
+
+[Box: ::math.calculus - ::math.calculus::LinearAlgebra]
+X=20
+Y=40
+
+[Diagram: ::math.calculus]
+OffsetX=0
+OffsetY=0
+Visibility=0
+ShowAssoc=1
+
+[Box: ::graphics - ::graphics::Graph2D]
+X=203
+Y=40
+
+[Box: ::graphics - ::graphics::Graphable]
+X=408
+Y=40
+
+[Box: ::graphics - ::graphics::Vector2D]
+X=291
+Y=1248
+
+[Box: ::graphics - ::math.graph::GraphDims]
+X=123
+Y=239
+
+[Box: ::graphics - ::math.graph::Plotable]
+X=291
+Y=1460
+
+[Box: ::graphics - ::math.matrices::Matrix]
+X=328
+Y=239
+
+[Box: ::graphics - ::math.matrices::Vector]
+X=304
+Y=802
+
+[Diagram: ::graphics]
+OffsetX=0
+OffsetY=0
+Visibility=0
+ShowAssoc=1
+
