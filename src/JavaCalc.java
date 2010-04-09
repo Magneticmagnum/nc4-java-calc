@@ -46,6 +46,8 @@ public class JavaCalc extends JFrame {
       panel.add(jGraph);
       panel.add(jDims);
 
+      jGraph.addGraphable(funcList);
+
       JSplitPane splitmain = new JSplitPane(JSplitPane.VERTICAL_SPLIT, panel, funcList);
       splitmain.setDividerLocation(400);
       calc.add(splitmain);

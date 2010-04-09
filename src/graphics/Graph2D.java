@@ -69,6 +69,10 @@ public class Graph2D {
       graph.fillOval((int) p.getX() - radius, (int) p.getY() - radius, 2 * radius, 2 * radius);
    }
 
+   public void setColor(Color c) {
+      graph.setColor(c);
+   }
+
 
    public double getWidth() {
       return graph.getClipBounds().getWidth();

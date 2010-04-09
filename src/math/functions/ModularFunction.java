@@ -29,7 +29,10 @@ public class ModularFunction extends Function {
 
    @Override
    public boolean equals(Object obj) {
-      return func.equals(obj);
+      if (obj instanceof ModularFunction)
+         return func.equals(((ModularFunction) obj).func);
+      else
+         return func.equals(obj);
    }
 
 }

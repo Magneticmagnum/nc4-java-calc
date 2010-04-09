@@ -1,16 +1,20 @@
 package gui;
 
-import graphics.Vector2D;
+import graphics.Graph2D;
+import graphics.Graphable;
+import gui.funcops.Differentiate;
+import gui.funcops.FunctionOperation;
+import gui.funcops.TangentLine;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.util.LinkedList;
 
 import javax.swing.GroupLayout;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -18,30 +22,31 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.GroupLayout.Alignment;
 
-import math.calculus.Differentiation;
 import math.functions.ExpressionEngine;
 import math.functions.Function;
 import math.functions.ModularFunction;
-import math.graph.IGraph;
 
-public class JFunctionPanel extends JPanel implements ActionListener, FocusListener {
+public class JFunctionPanel extends JPanel implements ActionListener, FocusListener, Graphable {
 
-   private static final long serialVersionUID = 4165856416862963979L;
+   private static final long             serialVersionUID = 4165856416862963979L;
 
-   private ModularFunction   f;
-   private IGraph<Vector2D>  graph;
+   private ModularFunction               f;
 
-   private JTextField        functionText;
-   private JMenuBar          functionMenu;
+   private JButton                       remove;
+   private JTextField                    functionText;
+   private JMenuBar                      functionMenu;
 
-   public JFunctionPanel(IGraph<Vector2D> graph) {
+   private LinkedList<FunctionOperation> ops;
+
+   public JFunctionPanel() {
       f = new ModularFunction();
-      this.graph = graph;
-      this.graph.add(f);
 
+      remove = new JButton("x");
       functionText = new JTextField();
       functionText.addActionListener(this);
       functionText.addFocusListener(this);
+
+      ops = new LinkedList<FunctionOperation>();
 
       buildFuncMenu();
       buildLayout();
@@ -51,10 +56,10 @@ public class JFunctionPanel extends JPanel implements ActionListener, FocusListe
       GroupLayout layout = new GroupLayout(this);
 
       GroupLayout.SequentialGroup hGroup = layout.createSequentialGroup();
-      hGroup.addComponent(functionText).addGap(5).addComponent(functionMenu);
+      hGroup.addComponent(remove).addGap(5).addComponent(functionText).addGap(5).addComponent(functionMenu);
 
       GroupLayout.ParallelGroup vGroup = layout.createParallelGroup(Alignment.BASELINE);
-      vGroup.addComponent(functionText).addComponent(functionMenu, 0, GroupLayout.PREFERRED_SIZE,
+      vGroup.addComponent(remove).addComponent(functionText).addComponent(functionMenu, 0, GroupLayout.PREFERRED_SIZE,
             GroupLayout.PREFERRED_SIZE);
 
       layout.setHorizontalGroup(hGroup);
@@ -68,7 +73,8 @@ public class JFunctionPanel extends JPanel implements ActionListener, FocusListe
       JMenu menu = new JMenu("Function Ops");
 
       JMenu differentiate = new JMenu("Differentiate");
-      differentiate.add(new DifferentiateFunc());
+      differentiate.add(new FuncOpCheckBox("Derivative", new Differentiate(f)));
+      differentiate.add(new FuncOpCheckBox("Tangent Line", new TangentLine(f)));
 
       JMenu integrate = new JMenu("Integrate");
 
@@ -76,6 +82,16 @@ public class JFunctionPanel extends JPanel implements ActionListener, FocusListe
       menu.add(integrate);
 
       functionMenu.add(menu);
+   }
+
+   public void addRemoveButtonActionListener(ActionListener listener) {
+      remove.addActionListener(listener);
+   }
+
+   @Override
+   public void onGraph(Graph2D graph) {
+      for (FunctionOperation op : ops)
+         op.onGraph(graph);
    }
 
    public String getText() {
@@ -86,12 +102,16 @@ public class JFunctionPanel extends JPanel implements ActionListener, FocusListe
       return f;
    }
 
-   @Override
-   public void actionPerformed(ActionEvent e) {
+   private void setFunction() {
       String text = getText();
       if (text.length() > 0)
          f.set(ExpressionEngine.construct(text, "x"));
       functionText.setBackground(f.equals(Function.NULL_FUNCTION) ? Color.RED : Color.WHITE);
+   }
+
+   @Override
+   public void actionPerformed(ActionEvent e) {
+      setFunction();
    }
 
    @Override
@@ -101,34 +121,16 @@ public class JFunctionPanel extends JPanel implements ActionListener, FocusListe
 
    @Override
    public void focusLost(FocusEvent e) {
-      String text = getText();
-      if (text.length() > 0)
-         f.set(ExpressionEngine.construct(text, "x"));
-      functionText.setBackground(f.equals(Function.NULL_FUNCTION) ? Color.RED : Color.WHITE);
+      setFunction();
    }
 
-   private class DifferentiateFunc extends JCheckBox implements ItemListener {
-
-      private static final long serialVersionUID = -864954151390321214L;
-      private ModularFunction   f_prime;
-
-      public DifferentiateFunc() {
-         super("Differentiate");
-         this.addItemListener(this);
-
-         f_prime = new ModularFunction();
-         graph.add(f_prime);
-      }
-
-      @Override
-      public void itemStateChanged(ItemEvent e) {
-         if (e.getStateChange() == ItemEvent.SELECTED) {
-            f_prime.set(Differentiation.derivative(f));
-         } else if (e.getStateChange() == ItemEvent.DESELECTED) {
-            f_prime.reset();
-         }
+   @SuppressWarnings("serial")
+   private class FuncOpCheckBox extends JCheckBox {
+      public FuncOpCheckBox(String name, FunctionOperation listener) {
+         super(name);
+         addItemListener(listener);
+         ops.add(listener);
       }
    }
-
 
 }
