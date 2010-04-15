@@ -5,14 +5,14 @@ import java.util.List;
 
 import math.functions.Function;
 
-public class Graph<E extends Plotable> implements IGraph<E> {
+public class Graph implements IGraph {
 
    private LinkedList<Function> functions;
-   private LinkedList<Plot<E>>  plots;
+   private LinkedList<Plot>     plots;
 
    public Graph() {
       functions = new LinkedList<Function>();
-      plots = new LinkedList<Plot<E>>();
+      plots = new LinkedList<Plot>();
    }
 
    @Override
@@ -31,17 +31,17 @@ public class Graph<E extends Plotable> implements IGraph<E> {
    }
 
    @Override
-   public void add(Plot<E> p) {
+   public void add(Plot p) {
       plots.add(p);
    }
 
    @Override
-   public boolean remove(Plot<E> p) {
+   public boolean remove(Plot p) {
       return plots.remove(p);
    }
 
    @Override
-   public List<Plot<E>> getPlots() {
+   public List<Plot> getPlots() {
       return plots;
    }
 

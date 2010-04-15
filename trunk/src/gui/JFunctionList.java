@@ -2,7 +2,6 @@ package gui;
 
 import graphics.Graph2D;
 import graphics.Graphable;
-import graphics.Vector2D;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -23,14 +22,14 @@ public class JFunctionList extends JPanel implements Graphable {
 
    private static final long          serialVersionUID = -1496183123559691747L;
 
-   private IGraph<Vector2D>           graph;
+   private IGraph                     graph;
 
    private LinkedList<JFunctionPanel> functionPanels;
    private JScrollPane                functionScrollPane;
    private JButton                    addButton;
 
 
-   public JFunctionList(IGraph<Vector2D> graph) {
+   public JFunctionList(IGraph graph) {
       this.graph = graph;
 
       functionScrollPane = new JScrollPane();

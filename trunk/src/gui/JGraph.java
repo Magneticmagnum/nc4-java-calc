@@ -35,17 +35,19 @@ public class JGraph extends JPanel implements GraphDimsSubscriber, ComponentList
    private Vector2D              mouse            = null;
    private Matrix                toGraph;
 
-   private IGraph<Vector2D>      graph;
+   private IGraph                graph;
+   private Plot                  userPlot;
    private LinkedList<Graphable> graphables;
 
    private GraphDims             original;
    private GraphDims             current;
 
-   public JGraph(IGraph<Vector2D> graph, GraphDims dimensions) {
+   public JGraph(IGraph graph, GraphDims dimensions) {
       this.original = dimensions.copy();
       this.current = dimensions;
       this.current.addSubscriber(this);
       this.graph = graph;
+      this.userPlot = new Plot();
       graphables = new LinkedList<Graphable>();
 
       setTransformations();
@@ -70,7 +72,7 @@ public class JGraph extends JPanel implements GraphDimsSubscriber, ComponentList
       graph2d.drawXYAxis();
       for (Function f : graph.getFunctions())
          graph2d.drawFunction(f);
-      for (Plot<Vector2D> p : graph.getPlots())
+      for (Plot p : graph.getPlots())
          graph2d.drawPlot(p);
 
       for (Graphable g : graphables)

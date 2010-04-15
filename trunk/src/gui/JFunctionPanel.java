@@ -66,6 +66,13 @@ public class JFunctionPanel extends JPanel implements ActionListener, FocusListe
       layout.setVerticalGroup(vGroup);
 
       this.setLayout(layout);
+
+//      setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+//
+//      remove.setSize(20, 20);
+//      add(remove);
+//      add(functionText);
+//      add(functionMenu);
    }
 
    private void buildFuncMenu() {
