@@ -3,27 +3,27 @@ package math.graph;
 import java.util.Collection;
 import java.util.LinkedList;
 
-public class Plot<E extends Plotable> {
+public class Plot {
 
-   private LinkedList<E> data;
+   private LinkedList<Plotable> data;
 
    public Plot() {
-      data = new LinkedList<E>();
+      data = new LinkedList<Plotable>();
    }
 
-   public Plot(Collection<E> c) {
-      data = new LinkedList<E>(c);
+   public <E extends Plotable> Plot(Collection<E> c) {
+      data = new LinkedList<Plotable>(c);
    }
 
-   public void add(E p) {
+   public void add(Plotable p) {
       data.add(p);
    }
 
-   public void remove(E p) {
+   public void remove(Plotable p) {
       data.remove(p);
    }
 
-   public LinkedList<E> getData() {
+   public LinkedList<Plotable> getData() {
       return data;
    }
 

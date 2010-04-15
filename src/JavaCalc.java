@@ -1,4 +1,3 @@
-import graphics.Vector2D;
 import gui.JFunctionList;
 import gui.JGraph;
 import gui.JGraphDims;
@@ -23,7 +22,7 @@ public class JavaCalc extends JFrame {
    public static void main(String[] args) {
       JavaCalc calc = new JavaCalc();
 
-      IGraph<Vector2D> graph = new Graph<Vector2D>();
+      IGraph graph = new Graph();
       JFunctionList funcList = new JFunctionList(graph);
       final GraphDims dims = new GraphDims(-10, 10, -10, 10);
 

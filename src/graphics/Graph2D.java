@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import math.functions.Function;
 import math.graph.GraphDims;
 import math.graph.Plot;
+import math.graph.Plotable;
 import math.matrices.Matrix;
 
 public class Graph2D {
@@ -53,8 +54,8 @@ public class Graph2D {
       }
    }
 
-   public void drawPlot(Plot<Vector2D> plot) {
-      for (Vector2D point : plot.getData())
+   public void drawPlot(Plot plot) {
+      for (Plotable point : plot.getData())
          fillCircle(point, 2);
    }
 
@@ -67,6 +68,10 @@ public class Graph2D {
    public void fillCircle(Vector2D p, int radius) {
       p = toWindow(p);
       graph.fillOval((int) p.getX() - radius, (int) p.getY() - radius, 2 * radius, 2 * radius);
+   }
+
+   public void fillCircle(Plotable p, int radius) {
+      fillCircle(new Vector2D(p.getX(), p.getY()), radius);
    }
 
    public void setColor(Color c) {

@@ -4,7 +4,7 @@ import java.util.List;
 
 import math.functions.Function;
 
-public interface IGraph<E extends Plotable> {
+public interface IGraph {
 
    public void add(Function f);
 
@@ -12,10 +12,10 @@ public interface IGraph<E extends Plotable> {
 
    public List<Function> getFunctions();
 
-   public void add(Plot<E> p);
+   public void add(Plot p);
 
-   public boolean remove(Plot<E> p);
+   public boolean remove(Plot p);
 
-   public List<Plot<E>> getPlots();
+   public List<Plot> getPlots();
 
 }

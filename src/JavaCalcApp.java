@@ -1,59 +1,67 @@
-import graphics.Vector2D;
+import gui.JFunctionList;
 import gui.JGraph;
 import gui.JGraphDims;
 
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.BoxLayout;
 import javax.swing.JApplet;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
 
-import math.calculus.Differentiation;
-import math.functions.Function;
-import math.functions.Quadratic;
-import math.functions.Trigonometric;
 import math.graph.Graph;
 import math.graph.GraphDims;
 import math.graph.IGraph;
-import math.graph.Plot;
 
 
 public class JavaCalcApp extends JApplet {
 
    private static final long serialVersionUID = -1506840320967282830L;
 
+   private JFrame            frame;
+
    @Override
    public void init() {
-      // Execute a job on the event-dispatching thread; creating this applet's GUI.
       try {
          SwingUtilities.invokeAndWait(new Runnable() {
             public void run() {
-               IGraph<Vector2D> graph = new Graph<Vector2D>();
+               IGraph graph = new Graph();
+               JFunctionList funcList = new JFunctionList(graph);
+               final GraphDims dims = new GraphDims(-10, 10, -10, 10);
 
-               Function f = Quadratic.createStandard(-2.0, 3.0, 3.0);
-               graph.add(f);
-               graph.add(Differentiation.derivative(f));
-               graph.add(Trigonometric.createSinusoid(3.0, 1.0, 0.0));
-               graph.add(Quadratic.createStandard(2.0, -3.0, -3.0));
+               JGraph jGraph = new JGraph(graph, dims);
+               JButton jDims = new JButton("Set Dimensions");
+               jDims.setAlignmentX(Component.CENTER_ALIGNMENT);
+               jDims.addActionListener(new ActionListener() {
+                  @Override
+                  public void actionPerformed(ActionEvent e) {
+                     if (frame == null) {
+                        frame = new JFrame("Graph Dimensions");
+                        frame.add(new JGraphDims(dims));
+                        frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+                        frame.pack();
+                        frame.setVisible(true);
+                     } else {
+                        frame.setVisible(true);
+                     }
+                  }
+               });
 
-               Plot<Vector2D> p = new Plot<Vector2D>();
-               p.add(new Vector2D(2.0, 2.0));
-               p.add(new Vector2D(2.0, -2.0));
-               p.add(new Vector2D(-2.0, 2.0));
-               p.add(new Vector2D(-2.0, -2.0));
+               JPanel panel = new JPanel();
+               panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+               panel.add(jGraph);
+               panel.add(jDims);
 
-               graph.add(p);
+               jGraph.addGraphable(funcList);
 
-               GraphDims dims1 = new GraphDims(-10, 10, -10, 10);
-               JGraph g1 = new JGraph(graph, dims1);
-               GraphDims dims2 = new GraphDims(-35, 35, -10, 10);
-               JGraph g2 = new JGraph(graph, dims2);
-
-               JSplitPane split1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, g1, new JGraphDims(dims1));
-               JSplitPane split2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, g2, new JGraphDims(dims2));
-               split1.setDividerLocation(getWidth() / 2);
-               split2.setDividerLocation(getWidth() / 2);
-
-               JSplitPane splitmain = new JSplitPane(JSplitPane.VERTICAL_SPLIT, split1, split2);
-               splitmain.setDividerLocation(getHeight() / 2);
+               JSplitPane splitmain = new JSplitPane(JSplitPane.VERTICAL_SPLIT, panel, funcList);
+               splitmain.setDividerLocation(400);
                add(splitmain);
             }
          });
